@@ -1,4 +1,3 @@
-import useScript from "../../hooks/useScript";
 import "./index.css";
 
 export function NotFoundPage() {

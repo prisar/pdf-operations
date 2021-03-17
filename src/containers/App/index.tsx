@@ -5,6 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import "./index.css";
 import HomePage from "../HomePage";
 import LoginPage from "../Auth/LoginPage";
+import MergePage from "../Pdf/MergePage";
 import NotFoundPage from "../NotFoundPage";
 import Header from "../../components/Header";
 
@@ -25,6 +26,7 @@ export function App() {
         <Header />
         <Switch>
           <Route exact path="/" component={HomePage} />
+          <Route exact path="/merge" component={MergePage} />
           {/* <PrivateRoute path="/profile" component={UserProfilePage} /> */}
           <Route path="/login" component={LoginPage} />
         {/* <Route path="/logout" component={LogoutPage} /> */}

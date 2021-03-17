@@ -102,9 +102,9 @@ function Header() {
         </button>
 
         <div className="collapse navbar-collapse" id="navbarColor01">
-          {false ? authMenus : guestMenus}
+          {true ? authMenus : guestMenus}
           <div className="form-inline my-2 my-lg-0">
-            {false ? authLinks : guestLinks}
+            {true ? authLinks : guestLinks}
           </div>
         </div>
       </nav>
