@@ -6,6 +6,10 @@ import "./index.css";
 import HomePage from "../HomePage";
 import LoginPage from "../Auth/LoginPage";
 import MergePage from "../Pdf/MergePage";
+import SplitPage from "../Pdf/SplitPage";
+import DeletePage from "../Pdf/DeletePage";
+import ReoderPage from "../Pdf/ReoderPage";
+import DocSignPage from "../Pdf/DocSignPage";
 import NotFoundPage from "../NotFoundPage";
 import Header from "../../components/Header";
 
@@ -27,6 +31,10 @@ export function App() {
         <Switch>
           <Route exact path="/" component={HomePage} />
           <Route exact path="/merge" component={MergePage} />
+          <Route exact path="/split" component={SplitPage} />
+          <Route exact path="/delete" component={DeletePage} />
+          <Route exact path="/reorder" component={ReoderPage} />
+          <Route exact path="/docsign" component={DocSignPage} />
           {/* <PrivateRoute path="/profile" component={UserProfilePage} /> */}
           <Route path="/login" component={LoginPage} />
         {/* <Route path="/logout" component={LogoutPage} /> */}

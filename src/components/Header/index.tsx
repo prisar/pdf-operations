@@ -32,6 +32,11 @@ function Header() {
             Reorder
           </Link>
         </li>
+        <li className="nav-item">
+          <Link className="nav-link" to="/docsign">
+            eSign
+          </Link>
+        </li>
       </ul>
     </Fragment>
   );
@@ -87,7 +92,7 @@ function Header() {
     <div>
       <nav className="navbar navbar-expand-lg navbar-dark app-header">
         <Link className="navbar-brand" to="/">
-          Adobe
+          PDF Operations
         </Link>
         <button
           className="navbar-toggler"
