@@ -4,6 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 import "./index.css";
 import HomePage from "../HomePage";
+import LoginPage from "../Auth/LoginPage";
 import NotFoundPage from "../NotFoundPage";
 import Header from "../../components/Header";
 
@@ -25,8 +26,8 @@ export function App() {
         <Switch>
           <Route exact path="/" component={HomePage} />
           {/* <PrivateRoute path="/profile" component={UserProfilePage} /> */}
-          {/* <Route path="/login" component={LoginPage} />
-        <Route path="/logout" component={LogoutPage} /> */}
+          <Route path="/login" component={LoginPage} />
+        {/* <Route path="/logout" component={LogoutPage} /> */}
           <Route path="" component={NotFoundPage} />
         </Switch>
       </Router>
