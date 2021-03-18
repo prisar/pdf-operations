@@ -26,7 +26,6 @@ export function App() {
   return (
     <AppWrapper>
       <Router>
-        {/* <Header {...headerProps} /> */}
         <Header />
         <Switch>
           <Route exact path="/" component={HomePage} />
@@ -35,9 +34,7 @@ export function App() {
           <Route exact path="/delete" component={DeletePage} />
           <Route exact path="/reorder" component={ReoderPage} />
           <Route exact path="/docsign" component={DocSignPage} />
-          {/* <PrivateRoute path="/profile" component={UserProfilePage} /> */}
           <Route path="/login" component={LoginPage} />
-        {/* <Route path="/logout" component={LogoutPage} /> */}
           <Route path="" component={NotFoundPage} />
         </Switch>
       </Router>

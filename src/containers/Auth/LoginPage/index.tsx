@@ -1,6 +1,8 @@
 import React from 'react';
 import { Container, Row, Col, Button, Form } from 'react-bootstrap';
 
+import constants from '../../../config/constants';
+
 export function LoginPage() {
     const [username, setUsername] = React.useState('');
     const [password, setPassword] = React.useState('');
@@ -10,7 +12,7 @@ export function LoginPage() {
             username,
             password
         };
-        const url = 'http://localhost:8000/api/v1/auth/login';
+        const url = `${constants.backend}/api/v1/auth/login`;
         const response = await fetch(url, {
             method: 'POST', // *GET, POST, PUT, DELETE, etc.
             // mode: 'cors', // no-cors, *cors, same-origin
