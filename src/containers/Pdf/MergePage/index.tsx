@@ -190,22 +190,20 @@ export function MergePage() {
             </Dropzone>
           </div>
 
-          <div style={{ flexDirection: "column" }}>
-            <CustomBtn onClick={uploadFiles}>
-              <CustomBtnText>Upload</CustomBtnText>
-            </CustomBtn>
-            <CustomBtn onClick={previewPdf}>
-              <CustomBtnText>View 1</CustomBtnText>
-            </CustomBtn>
+          <CustomBtn onClick={uploadFiles}>
+            <CustomBtnText>Upload</CustomBtnText>
+          </CustomBtn>
+          <CustomBtn onClick={previewPdf}>
+            <CustomBtnText>View 1</CustomBtnText>
+          </CustomBtn>
 
-            <CustomBtn onClick={previewPdf}>
-              <CustomBtnText>View 2</CustomBtnText>
-            </CustomBtn>
+          <CustomBtn onClick={previewPdf}>
+            <CustomBtnText>View 2</CustomBtnText>
+          </CustomBtn>
 
-            <CustomBtn onClick={merge}>
-              <CustomBtnText>Merge</CustomBtnText>
-            </CustomBtn>
-          </div>
+          <CustomBtn onClick={merge}>
+            <CustomBtnText>Merge</CustomBtnText>
+          </CustomBtn>
 
           {error && <div style={{ fontSize: 32, color: "#000", margin: 20 }}>{error.toString()}</div>}
 
