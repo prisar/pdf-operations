@@ -1,9 +1,12 @@
+import React from 'react';
 import "./index.css";
 import PdfView from '../../../components/PdfView';
 import PdfUpload from '../../../components/PdfUpload';
 import { Button } from 'react-bootstrap';
 
 export function SplitPage() {
+
+  const [showPdfView, setShowPdfView] = React.useState(false);
 
   const split = async () => {
     // split api call
@@ -18,7 +21,7 @@ export function SplitPage() {
       <Button variant="primary" onClick={split}>
         Split
       </Button>
-      <PdfView divId="adobe-dc-view-1" location="http://localhost:8000/api/v1/pdf/download?file=3087.pdf" fileName="3087.pdf" />
+      {showPdfView && <PdfView divId="adobe-dc-view-1" location="http://localhost:8000/api/v1/pdf/download?file=reorderPagesInput.pdf" fileName="reorderPagesInput.pdf" />}
       {/* <PdfView divId="adobe-dc-view-2" location="https://documentcloud.adobe.com/view-sdk-demo/PDFs/Bodea Brochure.pdf" fileName="Bodea Brochure.pdf" /> */}
     </div>
   );
