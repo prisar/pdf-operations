@@ -1,8 +1,8 @@
+import styled from "styled-components";
+
 import "./index.css";
 import PdfView from "../../../components/PdfView";
 import PdfUpload from "../../../components/PdfUpload";
-import { Button } from "react-bootstrap";
-import styled from "styled-components";
 
 const CustomBtn = styled.div`
   position: relative;

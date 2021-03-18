@@ -122,7 +122,7 @@ export function HomePage() {
           <PropositionBox>
             <FistSentence>Pdf Operations using Adobe API</FistSentence>
             <SecondSentence>You can manipulate your pdf and do things like merging, splitting, deleting and reordering pages. On top of that you can eSign also.</SecondSentence>
-            <Link className="nav-link" to="/merge">
+            <Link className="nav-link" to="/login">
               <GetStartedButtonBox>
                 <GetStartedButton>
                   <GetStartedButtonText>Get Started</GetStartedButtonText>
