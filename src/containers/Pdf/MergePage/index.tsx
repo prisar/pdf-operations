@@ -4,8 +4,24 @@ import styled from "styled-components";
 
 import "./index.css";
 import PdfView from "../../../components/PdfView";
-import PdfUpload from "../../../components/PdfUpload";
 import constants from "../../../config/constants";
+
+const ContainerBox = styled.div`
+  position: relative;
+  width: 1440px;
+  height: 700px;
+  left: 0px;
+`;
+
+const Container = styled.div`
+  position: absolute;
+  width: 1440px;
+  height: 700px;
+  left: 0px;
+  top: 0px;
+
+  background: #f2f2f2;
+`;
 
 const CustomBtn = styled.div`
   position: relative;
@@ -146,55 +162,56 @@ export function MergePage() {
     setPreview(!preview);
   };
 
-  React.useEffect(() => {
-
-  }, [outputfile]);
+  React.useEffect(() => {}, [outputfile]);
 
   return (
     <div style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <div style={{ marginLeft: 40 }}>
-        <Dropzone
-          onDrop={(acceptedFiles) => {
-            processFiles(acceptedFiles);
-          }}
-        >
-          {({ getRootProps, getInputProps }) => (
-            <section>
-              <div style={{ width: 1080, height: 120, backgroundColor: "red", margin: 20, borderRadius: 10, justifyContent: "center", alignItems: "center" }} {...getRootProps()}>
-                <input {...getInputProps()} />
-                <div style={{ margin: 10, height: 30, color: "#fff" }}>
-                  <p>Drag 'n' drop some files here, or click to select files</p>
-                </div>
+      <ContainerBox>
+        <Container>
+          <div style={{ marginLeft: 40 }}>
+            <Dropzone
+              onDrop={(acceptedFiles) => {
+                processFiles(acceptedFiles);
+              }}
+            >
+              {({ getRootProps, getInputProps }) => (
+                <section>
+                  <div style={{ width: 1080, height: 120, backgroundColor: "red", margin: 20, borderRadius: 10, justifyContent: "center", alignItems: "center" }} {...getRootProps()}>
+                    <input {...getInputProps()} />
+                    <div style={{ margin: 10, height: 30, color: "#fff" }}>
+                      <p>Drag 'n' drop some files here, or click to select files</p>
+                    </div>
 
-                <div style={{ margin: 10, height: 30, color: "#fff" }}>{(firstfiledata as any).name}</div>
-                <div style={{ margin: 10, height: 30, color: "#fff" }}>{(secondfiledata as any).name}</div>
-              </div>
-            </section>
-          )}
-        </Dropzone>
-      </div>
+                    <div style={{ margin: 10, height: 30, color: "#fff" }}>{(firstfiledata as any).name}</div>
+                    <div style={{ margin: 10, height: 30, color: "#fff" }}>{(secondfiledata as any).name}</div>
+                  </div>
+                </section>
+              )}
+            </Dropzone>
+          </div>
 
-      <div style={{ flexDirection: "column" }}>
-        <CustomBtn onClick={uploadFiles}>
-          <CustomBtnText>Upload</CustomBtnText>
-        </CustomBtn>
-        <CustomBtn onClick={previewPdf}>
-          <CustomBtnText>View 1</CustomBtnText>
-        </CustomBtn>
+          <div style={{ flexDirection: "column" }}>
+            <CustomBtn onClick={uploadFiles}>
+              <CustomBtnText>Upload</CustomBtnText>
+            </CustomBtn>
+            <CustomBtn onClick={previewPdf}>
+              <CustomBtnText>View 1</CustomBtnText>
+            </CustomBtn>
 
-        <CustomBtn onClick={previewPdf}>
-          <CustomBtnText>View 2</CustomBtnText>
-        </CustomBtn>
+            <CustomBtn onClick={previewPdf}>
+              <CustomBtnText>View 2</CustomBtnText>
+            </CustomBtn>
 
-        <CustomBtn onClick={merge}>
-          <CustomBtnText>Merge</CustomBtnText>
-        </CustomBtn>
-      </div>
+            <CustomBtn onClick={merge}>
+              <CustomBtnText>Merge</CustomBtnText>
+            </CustomBtn>
+          </div>
 
-      {error && <div style={{ fontSize: 32, color: "#000", margin: 20 }}>{error.toString()}</div>}
+          {error && <div style={{ fontSize: 32, color: "#000", margin: 20 }}>{error.toString()}</div>}
 
-      {preview && <PdfView divId="adobe-dc-view-1" location={`http://localhost:8000/api/v1/pdf/download?file=${outputfile}`} fileName={outputfile || ''} />}
-      {/* <PdfView divId="adobe-dc-view-2" location="https://documentcloud.adobe.com/view-sdk-demo/PDFs/Bodea Brochure.pdf" fileName="Bodea Brochure.pdf" /> */}
+          {preview && <PdfView divId="adobe-dc-view-1" location={`${constants.backend}/api/v1/pdf/download?file=${outputfile}`} fileName={outputfile || ""} />}
+        </Container>
+      </ContainerBox>
     </div>
   );
 }
