@@ -5,6 +5,7 @@ import styled from "styled-components";
 import "./index.css";
 import PdfView from "../../../components/PdfView";
 import PdfUpload from "../../../components/PdfUpload";
+import constants from '../../../config/constants';
 
 const CustomBtn = styled.div`
   position: relative;
@@ -55,19 +56,10 @@ export function MergePage() {
     data.append("pdfFile", firstfiledata);
     console.log(data);
 
-    const url = "http://localhost:8000/api/v1/pdf/upload";
+    const url = `${constants.backend}/api/v1/pdf/upload`;
     const response = await fetch(url, {
-      method: "POST", // *GET, POST, PUT, DELETE, etc.
-      // mode: 'cors', // no-cors, *cors, same-origin
-      //   cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
-      // credentials: 'same-origin', // include, *same-origin, omit
-      //   headers: {
-      //     "Content-Type": "multipart/form-data",
-      //     // 'Content-Type': 'application/x-www-form-urlencoded',
-      //   },
-      // redirect: 'follow', // manual, *follow, error
-      // referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-      body: data, // body data type must match "Content-Type" header
+      method: "POST",
+      body: data,
     });
     console.log(response.json());
   };
@@ -86,9 +78,6 @@ export function MergePage() {
 
   return (
     <div style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      {/* <PdfUpload />
-      <PdfUpload /> */}
-
       <Dropzone
         onDrop={(acceptedFiles) => {
           processFiles(acceptedFiles);
