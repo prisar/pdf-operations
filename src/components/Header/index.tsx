@@ -6,35 +6,35 @@ function Header() {
   const authMenus = (
     <Fragment>
       <ul className="navbar-nav mr-auto">
-        <li className="nav-item active">
+        <li className="nav-item">
           <Link className="nav-link" to="/">
-            Home{' '}
-            <span className="sr-only">(current)</span>
+            <div className="link-text">Home{' '}</div>
+            {/* <span className="sr-only">(current)</span> */}
           </Link>
         </li>
         <li className="nav-item">
           <Link className="nav-link" to="/merge">
-            Merge
+          <div className="link-text">Merge</div>
           </Link>
         </li>
         <li className="nav-item">
           <Link className="nav-link" to="/split">
-            Split
+          <div className="link-text">Split</div>
           </Link>
         </li>
         <li className="nav-item">
           <Link className="nav-link" to="/delete">
-            Delete
+          <div className="link-text">Delete</div>
           </Link>
         </li>
         <li className="nav-item">
           <Link className="nav-link" to="/reorder">
-            Reorder
+          <div className="link-text">Reorder</div>
           </Link>
         </li>
         <li className="nav-item">
           <Link className="nav-link" to="/docsign">
-            eSign
+          <div className="link-text">eSign</div>
           </Link>
         </li>
       </ul>
@@ -46,13 +46,13 @@ function Header() {
       <ul className="navbar-nav mr-auto">
         <li className="nav-item active">
           <Link className="nav-link" to="/">
-            Home{' '}
-            <span className="sr-only">(current)</span>
+          <div className="link-text">Home{' '}</div>
+            {/* <span className="sr-only">(current)</span> */}
           </Link>
         </li>
         <li className="nav-item">
           <Link className="nav-link" to="/about">
-            About
+          <div className="link-text">About</div>
           </Link>
         </li>
       </ul>
@@ -69,7 +69,7 @@ function Header() {
         </li>
         <li className="nav-item">
           <Link className="nav-link active my-2 my-sm-0" to="/logout">
-            Logout
+          <div className="link-text">Logout</div>
           </Link>
         </li>
       </ul>
@@ -81,7 +81,7 @@ function Header() {
       <ul className="navbar-nav mr-auto">
         <li className="nav-item">
           <Link className="nav-link active my-2 my-sm-0" to="/login">
-            Login
+          <div className="link-text">Login</div>
           </Link>
         </li>
       </ul>
@@ -92,7 +92,7 @@ function Header() {
     <div>
       <nav className="navbar navbar-expand-lg navbar-dark app-header">
         <Link className="navbar-brand" to="/">
-          PDF Operations
+          <div className="app-name">PDF Operations</div>
         </Link>
         <button
           className="navbar-toggler"
