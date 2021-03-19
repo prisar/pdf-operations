@@ -113,6 +113,9 @@ export function DocSignPage() {
   };
 
   const processFiles = (acceptedFiles: any) => {
+    if (!accessToken) {
+      alert("Signin with adobe first!");
+    }
     if (acceptedFiles.length === 1) {
       setFiledata(acceptedFiles[0]);
     } else {
