@@ -73,6 +73,10 @@ export function DocSignPage() {
 
   const esign = async () => {
     try {
+      if (!accessToken) {
+        alert("Signin with adobe first!");
+      }
+
       // create agreement
       const data = new FormData();
       data.append("pdfFile", filedata);
@@ -80,7 +84,7 @@ export function DocSignPage() {
       const url = `${apiAccessPoint}api/rest/v6/transientDocuments`;
       const response = await fetch(url, {
         method: "POST",
-        mode: 'no-cors',
+        mode: 'cors',
         headers: {
           Authorization: `Bearer ${accessToken}`,
           "Content-Type": "multipart/form-data",
