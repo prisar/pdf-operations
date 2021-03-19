@@ -1,6 +1,7 @@
 import React from "react";
 import Dropzone from "react-dropzone";
 import styled from "styled-components";
+import { useHistory } from "react-router-dom";
 
 import "./index.css";
 import PdfView from "../../../components/PdfView";
@@ -66,13 +67,18 @@ export function DocSignPage() {
   const [outputfile, setOutputfile] = React.useState(null);
   const [error, setError] = React.useState("");
 
+  const history = useHistory();
+
   const esign = () => {
     try {
       //
+      const authUri = `${constants.esignauthshardendpoint}?redirect_uri=${constants.host}}/docsign&response_type=code&client_id=${constants.esignauthclientid}&scope=user_login:self+agreement_send:account`;
+      alert(authUri);
+      window.location.href = authUri;
     } catch (err) {
-      
+      console.log(err);
     }
-  }
+  };
 
   const uploadPdf = async () => {
     try {

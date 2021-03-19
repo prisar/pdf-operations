@@ -31,4 +31,8 @@ https://www.adobe.io/apis/documentcloud/dcsdk/pdf-tools.html
 
 Figma wireframing
 
+## Test User
 
+    username: amit
+    email: amit@example.com
+    password: iLEjAOzlaa
