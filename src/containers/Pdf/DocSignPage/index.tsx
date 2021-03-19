@@ -142,6 +142,7 @@ export function DocSignPage() {
     const webaccesspoint = new URLSearchParams(window.location.search).get("web_access_point");
     if (auth_code) {
       getAccessToken(apiaccesspoint as string, auth_code);
+      setApiAccessPoint(apiaccesspoint as any);
       localStorage.setItem("api_access_point", JSON.stringify(apiaccesspoint));
     }
   }, []);
