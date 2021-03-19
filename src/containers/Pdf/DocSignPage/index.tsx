@@ -77,6 +77,10 @@ export function DocSignPage() {
         alert("Signin with adobe first!");
       }
 
+      if (!apiAccessPoint) {
+        alert("Api access point is set incorectly!");
+      }
+
       // create agreement
       const data = new FormData();
       data.append(";File", filedata);
@@ -153,6 +157,18 @@ export function DocSignPage() {
       setApiAccessPoint(apiaccesspoint as any);
       localStorage.setItem("api_access_point", JSON.stringify(apiaccesspoint));
     }
+
+    history.listen((location: any, action: any) => {
+      // console.log(action, location.pathname, location.state);
+      const esign_api_access_point = JSON.parse(localStorage.getItem("api_access_point") as string);
+      const esign_token = JSON.parse(localStorage.getItem("access_token") as string);
+      if (esign_api_access_point) {
+        setApiAccessPoint(esign_api_access_point as any);
+      }
+      if (esign_token) {
+        setAccessToken(esign_token as any);
+      }
+    });
   }, []);
 
   return (
