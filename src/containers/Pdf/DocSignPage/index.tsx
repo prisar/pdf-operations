@@ -72,7 +72,7 @@ export function DocSignPage() {
   const esign = () => {
     try {
       //
-      const authUri = `${constants.esignauthshardendpoint}?redirect_uri=${constants.host}}/docsign&response_type=code&client_id=${constants.esignauthclientid}&scope=user_login:self+agreement_send:account`;
+      const authUri = `${constants.esignauthshardendpoint}?redirect_uri=${constants.host}/docsign&response_type=code&client_id=${constants.esignauthclientid}&scope=user_login:self+agreement_send:account`;
       alert(authUri);
       window.location.href = authUri;
     } catch (err) {
