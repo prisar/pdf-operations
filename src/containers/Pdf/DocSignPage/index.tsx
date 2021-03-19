@@ -65,6 +65,7 @@ export function DocSignPage() {
   const [preview, setPreview] = React.useState(false);
   const [filedata, setFiledata] = React.useState(new Blob());
   const [outputfile, setOutputfile] = React.useState(null);
+  const [accessToken, setAccessToken] = React.useState(null);
   const [error, setError] = React.useState("");
 
   const history = useHistory();
@@ -73,8 +74,10 @@ export function DocSignPage() {
     try {
       //
       const authUri = `${constants.esignauthshardendpoint}?redirect_uri=${constants.host}/docsign&response_type=code&client_id=${constants.esignauthclientid}&scope=user_login:self+agreement_send:account`;
-      alert(authUri);
-      window.location.href = authUri;
+      // window.location.href = authUri;
+
+      const apiaccesspoint = (new URLSearchParams(window.location.search)).get("api_access_point");
+      alert(apiaccesspoint);
     } catch (err) {
       console.log(err);
     }
@@ -102,6 +105,32 @@ export function DocSignPage() {
       setError("Check the no of files");
     }
   };
+
+  const getAccessToken = async (apiaccesspoint: string, code: string, ) => {
+    try {
+      const url = `${apiaccesspoint}oauth/token?code=${code}&client_id=${constants.esignauthclientid}&client_secret=${constants.esignauthclientsecret}&redirect_uri=${constants.host}/docsign&grant_type=authorization_code`;
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      });
+      const jsonResponse = await response.json();
+      setAccessToken(jsonResponse.access_token);
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  React.useEffect(()=> {
+    const auth_code = (new URLSearchParams(window.location.search)).get("code");
+    const apiaccesspoint = (new URLSearchParams(window.location.search)).get("api_access_point");
+    const webaccesspoint = (new URLSearchParams(window.location.search)).get("web_access_point");
+      if (auth_code) {
+        getAccessToken(apiaccesspoint as string, auth_code);
+        localStorage.setItem("api_access_point", JSON.stringify(apiaccesspoint));
+      }
+  }, []);
 
   return (
     <div>
