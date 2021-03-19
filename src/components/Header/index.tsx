@@ -68,7 +68,7 @@ function Header() {
           </span>
         </li>
         <li className="nav-item">
-          <Link className="nav-link active my-2 my-sm-0" to="/logout">
+          <Link className="nav-link active my-2 my-sm-0" to="/login">
           <div className="link-text">Logout</div>
           </Link>
         </li>
