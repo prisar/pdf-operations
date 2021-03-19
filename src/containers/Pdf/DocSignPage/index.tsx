@@ -83,7 +83,7 @@ export function DocSignPage() {
         headers: {
           Authorization: `Bearer ${accessToken}`,
           "Content-Type": "multipart/form-data",
-          "Content-Disposition": `form-data; name=";File"; filename="MyPDF.pdf"`,
+          // "Content-Disposition": `form-data; name=";File"; filename="MyPDF.pdf"`,
         },
         body: data,
       });

@@ -27,6 +27,8 @@ https://www.adobe.io/apis/documentcloud/dcsdk/pdf-tools.html
 
 [Heruku](https://pdf-operations.herokuapp.com)
 
+Because of cold start of dynos, refresh might be required intially.
+
 # Theme
 
 Figma wireframing
