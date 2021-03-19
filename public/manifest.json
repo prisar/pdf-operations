@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Pdf Operations",
+  "name": "Perform pdf operations like merging, spliting, deleting and reordering with eSign option",
   "icons": [
     {
       "src": "favicon.ico",
