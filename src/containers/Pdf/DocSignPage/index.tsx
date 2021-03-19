@@ -65,34 +65,47 @@ export function DocSignPage() {
   const [preview, setPreview] = React.useState(false);
   const [filedata, setFiledata] = React.useState(new Blob());
   const [outputfile, setOutputfile] = React.useState(null);
+  const [apiAccessPoint, setApiAccessPoint] = React.useState(null);
   const [accessToken, setAccessToken] = React.useState(null);
   const [error, setError] = React.useState("");
 
   const history = useHistory();
 
-  const esign = () => {
+  const esign = async () => {
     try {
-      //
-      const authUri = `${constants.esignauthshardendpoint}?redirect_uri=${constants.host}/docsign&response_type=code&client_id=${constants.esignauthclientid}&scope=user_login:self+agreement_send:account`;
-      // window.location.href = authUri;
+      // create agreement
+      const data = new FormData();
+      data.append("pdfFile", filedata);
 
-      const apiaccesspoint = (new URLSearchParams(window.location.search)).get("api_access_point");
-      alert(apiaccesspoint);
+      const url = `${apiAccessPoint}api/rest/v6/transientDocuments`;
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "multipart/form-data",
+          "Content-Disposition": `form-data; name=";File"; filename="MyPDF.pdf"`,
+        },
+        body: data,
+      });
+      const jsonResponse = await response.json();
+      console.log(jsonResponse);
     } catch (err) {
       console.log(err);
     }
   };
 
-  const uploadPdf = async () => {
+  const checkStatus = () => {
     try {
-      const data = new FormData();
-      data.append("pdfFile", filedata);
+      // call status api
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
-      const url = `${constants.backend}/api/v1/pdf/upload`;
-      const response = await fetch(url, {
-        method: "POST",
-        body: data,
-      });
+  const adobeSignin = () => {
+    try {
+      const authUri = `${constants.esignauthshardendpoint}?redirect_uri=${constants.host}/docsign&response_type=code&client_id=${constants.esignauthclientid}&scope=user_login:self+agreement_send:account`;
+      window.location.href = authUri;
     } catch (err) {
       console.log(err);
     }
@@ -106,7 +119,7 @@ export function DocSignPage() {
     }
   };
 
-  const getAccessToken = async (apiaccesspoint: string, code: string, ) => {
+  const getAccessToken = async (apiaccesspoint: string, code: string) => {
     try {
       const url = `${apiaccesspoint}oauth/token?code=${code}&client_id=${constants.esignauthclientid}&client_secret=${constants.esignauthclientsecret}&redirect_uri=${constants.host}/docsign&grant_type=authorization_code`;
       const response = await fetch(url, {
@@ -117,19 +130,20 @@ export function DocSignPage() {
       });
       const jsonResponse = await response.json();
       setAccessToken(jsonResponse.access_token);
+      localStorage.setItem("access_token", JSON.stringify(jsonResponse.access_token));
     } catch (err) {
-      console.log(err)
+      console.log(err);
     }
-  }
+  };
 
-  React.useEffect(()=> {
-    const auth_code = (new URLSearchParams(window.location.search)).get("code");
-    const apiaccesspoint = (new URLSearchParams(window.location.search)).get("api_access_point");
-    const webaccesspoint = (new URLSearchParams(window.location.search)).get("web_access_point");
-      if (auth_code) {
-        getAccessToken(apiaccesspoint as string, auth_code);
-        localStorage.setItem("api_access_point", JSON.stringify(apiaccesspoint));
-      }
+  React.useEffect(() => {
+    const auth_code = new URLSearchParams(window.location.search).get("code");
+    const apiaccesspoint = new URLSearchParams(window.location.search).get("api_access_point");
+    const webaccesspoint = new URLSearchParams(window.location.search).get("web_access_point");
+    if (auth_code) {
+      getAccessToken(apiaccesspoint as string, auth_code);
+      localStorage.setItem("api_access_point", JSON.stringify(apiaccesspoint));
+    }
   }, []);
 
   return (
@@ -157,8 +171,16 @@ export function DocSignPage() {
             </Dropzone>
           </div>
 
+          <CustomBtn onClick={adobeSignin}>
+            <CustomBtnText>Adobe Signin</CustomBtnText>
+          </CustomBtn>
+
           <CustomBtn onClick={esign}>
             <CustomBtnText>eSign</CustomBtnText>
+          </CustomBtn>
+
+          <CustomBtn onClick={checkStatus}>
+            <CustomBtnText>Status</CustomBtnText>
           </CustomBtn>
 
           {error && <div style={{ fontSize: 32, color: "#000", margin: 20 }}>{error.toString()}</div>}
