@@ -84,7 +84,7 @@ export function DocSignPage() {
       const url = `${apiAccessPoint}api/rest/v6/transientDocuments`;
       const response = await fetch(url, {
         method: "POST",
-        mode: 'cors',
+        // mode: 'no-cors',
         headers: {
           Authorization: `Bearer ${accessToken}`,
           "Content-Type": "multipart/form-data",
