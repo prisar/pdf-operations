@@ -79,7 +79,7 @@ export function DocSignPage() {
 
       // create agreement
       const data = new FormData();
-      data.append("File", filedata);
+      data.append(";File", filedata);
 
       const url = `${apiAccessPoint}api/rest/v6/transientDocuments`;
       const response = await fetch(url, {
