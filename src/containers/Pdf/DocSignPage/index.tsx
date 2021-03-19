@@ -67,9 +67,59 @@ export function DocSignPage() {
   const [outputfile, setOutputfile] = React.useState(null);
   const [apiAccessPoint, setApiAccessPoint] = React.useState(null);
   const [accessToken, setAccessToken] = React.useState(null);
+  const [transientDocumentId, setTransientDocumentId] = React.useState(null);
+  const [signingStatus, setSigningStatus] = React.useState(null);
   const [error, setError] = React.useState("");
 
   const history = useHistory();
+
+  const createAgreement = async () => {
+    try {
+      // create agreement
+      const data = new FormData();
+      data.append("File", filedata);
+
+      const url = `${apiAccessPoint}api/rest/v6/transientDocuments`;
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "multipart/form-data",
+        },
+        body: data,
+      });
+      const jsonResponse = await response.json();
+
+      console.log(jsonResponse);
+      setTransientDocumentId(jsonResponse.transientDocumentId);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const sendAgreement = async () => {
+    try {
+      // create agreement
+      const data = new FormData();
+      data.append("File", filedata);
+
+      const url = `${apiAccessPoint}/api/rest/v6/agreements`;
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "multipart/form-data",
+        },
+        body: data,
+      });
+      const jsonResponse = await response.json();
+
+      console.log(jsonResponse);
+      setTransientDocumentId(jsonResponse.transientDocumentId);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   const esign = async () => {
     try {
@@ -81,31 +131,27 @@ export function DocSignPage() {
         alert("Api access point is set incorectly!");
       }
 
-      // create agreement
-      const data = new FormData();
-      data.append(";File", filedata);
+      await createAgreement();
 
-      const url = `${apiAccessPoint}api/rest/v6/transientDocuments`;
-      const response = await fetch(url, {
-        method: "POST",
-        // mode: 'no-cors',
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "multipart/form-data",
-          // "Content-Disposition": `form-data; name=";File"; filename="MyPDF.pdf"`,
-        },
-        body: data,
-      });
-      const jsonResponse = await response.json();
-      console.log(jsonResponse);
+      // send the document for sigining
+      await sendAgreement();
     } catch (err) {
       console.log(err);
     }
   };
 
-  const checkStatus = () => {
+  const checkStatus = async (agreementId: string) => {
     try {
       // call status api
+      const url = `${apiAccessPoint}api/rest/v6/agreements/${agreementId}`;
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      const jsonResponse = await response.json();
+      setSigningStatus(jsonResponse.status);
     } catch (err) {
       console.log(err);
     }
