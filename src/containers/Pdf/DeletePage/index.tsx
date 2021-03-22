@@ -1,6 +1,7 @@
 import React from "react";
 import Dropzone from "react-dropzone";
 import styled from "styled-components";
+import axios from "axios";
 
 import "./index.css";
 import PdfView from "../../../components/PdfView";
@@ -69,43 +70,46 @@ const PageInput = styled.input`
   bottom: 54.23%;
 `;
 
+const wait = (timeout: number) => {
+  return new Promise((resolve) => {
+    setTimeout(resolve, timeout);
+  });
+};
+
 export function DeletePage() {
-  const [preview, setPreview] = React.useState(false);
   const [filedata, setFiledata] = React.useState(new Blob());
-  const [secondfiledata, setSecondfiledata] = React.useState(new Blob());
   const [outputfile, setOutputfile] = React.useState(null);
   const [pageno, setPageno] = React.useState(null);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
 
-  const deletePages = async () => {
+  const deleteSinglePage = async () => {
     // delete api call
     try {
+      setLoading(true);
+      setOutputfile(null);
       const data = {
         pdfFile: (filedata as any).name,
-        pages: [1],
+        pages: [parseInt(pageno || '')],
         pageRanges: [
           {
             range: {
-              start: 3,
-              end: 4,
+              start: parseInt(pageno || ''),
+              end: parseInt(pageno || ''),
             },
           },
         ],
       };
-      console.log(data);
 
       const url = `${constants.backend}/api/v1/pdf/delete`;
-      const response = await fetch(url, {
-        method: "POST",
+      const response = await axios.post(url, data, {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
       });
-      const json = await response.json();
-      setOutputfile(json?.file);
-      return response;
+      await wait(15000);
+      setOutputfile(response.data?.file);
+      setLoading(false);
     } catch (err) {
       console.log(err);
     }
@@ -125,6 +129,7 @@ export function DeletePage() {
       setLoading(false);
     } catch (err) {
       console.log(err);
+      setLoading(false);
     }
   };
 
@@ -171,16 +176,17 @@ export function DeletePage() {
             <CustomBtnText>Upload</CustomBtnText>
           </CustomBtn>
 
-          <CustomBtn onClick={deletePages}>
+          <CustomBtn onClick={deleteSinglePage}>
             <CustomBtnText>Delete</CustomBtnText>
           </CustomBtn>
-          <PageInput type="text" onChange={onChangePageno}></PageInput>
 
           <Spinner loading={loading} />
 
+          <PageInput type="text" onChange={onChangePageno}></PageInput>
+
           {error && <div style={{ fontSize: 32, color: "#000", margin: 20 }}>{error.toString()}</div>}
 
-          {preview && <PdfView divId="adobe-dc-view-1" location={`${constants.backend}/api/v1/pdf/download?file=${outputfile}`} fileName={outputfile || ""} />}
+          {outputfile && <PdfView divId="adobe-dc-view-1" location={`${constants.backend}/api/v1/pdf/download?file=${outputfile}`} fileName={outputfile || ""} />}
         </Container>
       </ContainerBox>
     </div>
