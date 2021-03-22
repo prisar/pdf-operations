@@ -47,3 +47,8 @@ Credentials and configurations are in .env
 
 REACT_APP_HOST=https://localhost:3000
 REACT_APP_BACKEND=https://pdf-operations-backend.herokuapp.com
+
+
+# Delete Operation
+
+Takes page number and deletes that page. If successful, the pdf will be show as preview.

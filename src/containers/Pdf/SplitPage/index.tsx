@@ -4,6 +4,7 @@ import Dropzone from "react-dropzone";
 
 import "./index.css";
 import PdfView from "../../../components/PdfView";
+import Spinner from "../../../components/Loader/Spinner";
 import constants from "../../../config/constants";
 
 const ContainerBox = styled.div`
@@ -60,10 +61,45 @@ const CustomBtnText = styled.div`
   color: #ffffff;
 `;
 
+const PageInput = styled.input`
+  position: absolute;
+  left: 37.5%;
+  right: 37.5%;
+  top: 34.51%;
+  bottom: 54.23%;
+  // z-index: 999;
+  // opacity: 0.5;
+`;
+
+const PageInputPlaceholder = styled.div`
+  position: absolute;
+  left: 39.24%;
+  right: 54.65%;
+  top: 34.51%;
+  bottom: 42.96%;
+
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 20px;
+  line-height: 28px;
+  /* identical to box height */
+
+  color: rgba(0, 0, 0, 0.5);
+`;
+
+const wait = (timeout: number) => {
+  return new Promise((resolve) => {
+    setTimeout(resolve, timeout);
+  });
+};
+
 export function SplitPage() {
-  const [preview, setPreview] = React.useState(false);
   const [filedata, setFiledata] = React.useState(new Blob());
-  const [outputfile, setOutputfile] = React.useState(null);
+  const [firstoutputfile, setFirstOutputfile] = React.useState(null);
+  const [secondoutputfile, setSecondOutputfile] = React.useState(null);
+  const [pageno, setPageno] = React.useState(null);
+  const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
 
   const processFiles = (acceptedFiles: any) => {
@@ -76,6 +112,7 @@ export function SplitPage() {
 
   const uploadPdf = async () => {
     try {
+      setLoading(true)
       const data = new FormData();
       data.append("pdfFile", filedata);
 
@@ -84,14 +121,19 @@ export function SplitPage() {
         method: "POST",
         body: data,
       });
+      setLoading(false);
     } catch (err) {
       console.log(err);
+      setLoading(false);
     }
   };
 
   const split = async () => {
     // split api call
     try {
+      setLoading(true);
+      setFirstOutputfile(null);
+      setSecondOutputfile(null);
       const data = {
         pdfFile: (filedata as any).name,
         pages: [1],
@@ -115,14 +157,20 @@ export function SplitPage() {
         body: JSON.stringify(data),
       });
       const json = await response.json();
-      setOutputfile(json?.file);
-      return response;
+      setFirstOutputfile(json?.files[0]);
+      setSecondOutputfile(json?.files[1]);
+      setLoading(false);
     } catch (err) {
       console.log(err);
+      setLoading(false);
     }
   };
 
-  React.useEffect(() => {}, [outputfile]);
+  const onChangePageno = (event: any) => {
+    setPageno(event.target.value);
+  };
+
+  React.useEffect(() => {}, [firstoutputfile, secondoutputfile]);
 
   return (
     <div>
@@ -158,9 +206,14 @@ export function SplitPage() {
           <CustomBtn onClick={split}>
             <CustomBtnText>Split</CustomBtnText>
           </CustomBtn>
-          {error && <div style={{ fontSize: 32, color: "#000", margin: 20 }}>{error.toString()}</div>}
 
-          {preview && <PdfView divId="adobe-dc-view-1" location={`${constants.backend}/api/v1/pdf/download?file=${outputfile}`} fileName={outputfile || ""} />}
+          <PageInput type="text" onChange={onChangePageno}></PageInput>
+          {!pageno && <PageInputPlaceholder>Page Number</PageInputPlaceholder>}
+
+          {error && <div style={{ fontSize: 32, color: "#000", margin: 20 }}>{error.toString()}</div>}
+          <Spinner loading={loading} />
+          {firstoutputfile && <PdfView divId="adobe-dc-view-1" location={`${constants.backend}/api/v1/pdf/download?file=${firstoutputfile}`} fileName={firstoutputfile || ""} />}
+          {secondoutputfile && <PdfView divId="adobe-dc-view-1" location={`${constants.backend}/api/v1/pdf/download?file=${secondoutputfile}`} fileName={secondoutputfile || ""} />}
         </Container>
       </ContainerBox>
     </div>
