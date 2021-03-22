@@ -4,6 +4,7 @@ import styled from "styled-components";
 
 import "./index.css";
 import PdfView from "../../../components/PdfView";
+import Spinner from "../../../components/Loader/Spinner";
 import constants from "../../../config/constants";
 
 const ContainerBox = styled.div`
@@ -60,11 +61,21 @@ const CustomBtnText = styled.div`
   color: #ffffff;
 `;
 
+const PageInput = styled.input`
+  position: absolute;
+  left: 37.5%;
+  right: 37.5%;
+  top: 34.51%;
+  bottom: 54.23%;
+`;
+
 export function DeletePage() {
   const [preview, setPreview] = React.useState(false);
   const [filedata, setFiledata] = React.useState(new Blob());
   const [secondfiledata, setSecondfiledata] = React.useState(new Blob());
   const [outputfile, setOutputfile] = React.useState(null);
+  const [pageno, setPageno] = React.useState(null);
+  const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
 
   const deletePages = async () => {
@@ -102,6 +113,7 @@ export function DeletePage() {
 
   const uploadPdf = async () => {
     try {
+      setLoading(true);
       const data = new FormData();
       data.append("pdfFile", filedata);
 
@@ -110,6 +122,7 @@ export function DeletePage() {
         method: "POST",
         body: data,
       });
+      setLoading(false);
     } catch (err) {
       console.log(err);
     }
@@ -121,6 +134,10 @@ export function DeletePage() {
     } else {
       setError("Check the no of files");
     }
+  };
+
+  const onChangePageno = (event: any) => {
+    setPageno(event.target.value);
   };
 
   return (
@@ -157,6 +174,9 @@ export function DeletePage() {
           <CustomBtn onClick={deletePages}>
             <CustomBtnText>Delete</CustomBtnText>
           </CustomBtn>
+          <PageInput type="text" onChange={onChangePageno}></PageInput>
+
+          <Spinner loading={loading} />
 
           {error && <div style={{ fontSize: 32, color: "#000", margin: 20 }}>{error.toString()}</div>}
 

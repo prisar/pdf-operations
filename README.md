@@ -2,6 +2,10 @@
 
 [Adobe Challenge Series - Week 4/6] https://www.topcoder.com/challenges/77d8fcba-f169-4384-8e8e-3f9125908869
 
+# Video Demo
+
+https://www.dropbox.com/s/v5ctcvipt4ddvqj/demo.mov?dl=0
+
 ## Available Scripts
 
 In the project directory, you can run:
@@ -38,3 +42,8 @@ Figma wireframing
     username: amit
     email: amit@example.com
     password: iLEjAOzlaa
+
+Credentials and configurations are in .env
+
+REACT_APP_HOST=https://localhost:3000
+REACT_APP_BACKEND=https://pdf-operations-backend.herokuapp.com
