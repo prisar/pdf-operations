@@ -88,6 +88,8 @@ const PageInputPlaceholder = styled.div`
   color: rgba(0, 0, 0, 0.5);
 `;
 
+const TIMEOUT = 15000;
+
 const wait = (timeout: number) => {
   return new Promise((resolve) => {
     setTimeout(resolve, timeout);
@@ -100,6 +102,7 @@ export function SplitPage() {
   const [secondoutputfile, setSecondOutputfile] = React.useState(null);
   const [pageno, setPageno] = React.useState(null);
   const [loading, setLoading] = React.useState(false);
+  const [totalPages, setTotalPages] = React.useState(0);
   const [error, setError] = React.useState("");
 
   const processFiles = (acceptedFiles: any) => {
@@ -110,9 +113,22 @@ export function SplitPage() {
     }
   };
 
+  const constPages = () => {
+    const reader = new FileReader();
+    if (filedata) {
+      reader.readAsBinaryString(filedata);
+      reader.onloadend = () => {
+        const result = reader.result as string;
+        const count = result.match(/\/Type[\s]*\/Page[^s]/g)?.length;
+        setTotalPages(count as number);
+      };
+    }
+  };
+
   const uploadPdf = async () => {
     try {
-      setLoading(true)
+      setLoading(true);
+      constPages();
       const data = new FormData();
       data.append("pdfFile", filedata);
 
@@ -131,17 +147,35 @@ export function SplitPage() {
   const split = async () => {
     // split api call
     try {
+      if (!totalPages) {
+        return;
+      }
+      if (!pageno) {
+        setError("Add page no");
+        return;
+      }
+      if (parseInt(pageno || "") < 1 || parseInt(pageno || "") > totalPages+1) {
+        setError("Invalid pageno. Splits should have atleast one page");
+        return;
+      }
       setLoading(true);
+      setError('');
       setFirstOutputfile(null);
       setSecondOutputfile(null);
       const data = {
         pdfFile: (filedata as any).name,
-        pages: [1],
+        pages: [],
         pageRanges: [
           {
             range: {
-              start: 3,
-              end: 4,
+              start: 1,
+              end: parseInt(pageno || ""),
+            },
+          },
+          {
+            range: {
+              start: parseInt(pageno || "") + 1,
+              end: totalPages,
             },
           },
         ],
@@ -157,8 +191,11 @@ export function SplitPage() {
         body: JSON.stringify(data),
       });
       const json = await response.json();
-      setFirstOutputfile(json?.files[0]);
-      setSecondOutputfile(json?.files[1]);
+
+      await wait(2 * TIMEOUT);
+
+      setFirstOutputfile(json?.files.first);
+      setSecondOutputfile(json?.files.second);
       setLoading(false);
     } catch (err) {
       console.log(err);
@@ -207,13 +244,17 @@ export function SplitPage() {
             <CustomBtnText>Split</CustomBtnText>
           </CustomBtn>
 
+          <div style={{ alignSelf: "center", marginLeft: 60 }}>({totalPages})</div>
+
           <PageInput type="text" onChange={onChangePageno}></PageInput>
           {!pageno && <PageInputPlaceholder>Page Number</PageInputPlaceholder>}
 
           {error && <div style={{ fontSize: 32, color: "#000", margin: 20 }}>{error.toString()}</div>}
           <Spinner loading={loading} />
+          <div style={{flexDirection: 'column'}}>
           {firstoutputfile && <PdfView divId="adobe-dc-view-1" location={`${constants.backend}/api/v1/pdf/download?file=${firstoutputfile}`} fileName={firstoutputfile || ""} />}
-          {secondoutputfile && <PdfView divId="adobe-dc-view-1" location={`${constants.backend}/api/v1/pdf/download?file=${secondoutputfile}`} fileName={secondoutputfile || ""} />}
+          {secondoutputfile && <PdfView divId="adobe-dc-view-2" location={`${constants.backend}/api/v1/pdf/download?file=${secondoutputfile}`} fileName={secondoutputfile || ""} />}
+          </div>
         </Container>
       </ContainerBox>
     </div>

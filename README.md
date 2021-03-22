@@ -48,6 +48,10 @@ Credentials and configurations are in .env
 REACT_APP_HOST=https://localhost:3000
 REACT_APP_BACKEND=https://pdf-operations-backend.herokuapp.com
 
+# Split Operation
+
+If the splitting page number is 2, the first part will have that page and rest of the pages will go to the next part.
+So, page number as input is taken after uploading the file.
 
 # Delete Operation
 
