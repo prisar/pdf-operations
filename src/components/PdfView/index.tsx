@@ -30,7 +30,7 @@ export function PdfView({ divId, location, fileName }: IProps) {
       <div className="pdf-view">
         <div id={divId}></div>
       </div>
-      <div>Please refresh if it doesn't load</div>
+      {/* <div>Please refresh if it doesn't load</div> */}
     </div>
   );
 }
