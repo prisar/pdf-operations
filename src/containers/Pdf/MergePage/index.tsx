@@ -193,13 +193,13 @@ export function MergePage() {
           <CustomBtn onClick={uploadFiles}>
             <CustomBtnText>Upload</CustomBtnText>
           </CustomBtn>
-          <CustomBtn onClick={previewPdf}>
+          {/* <CustomBtn onClick={previewPdf}>
             <CustomBtnText>View 1</CustomBtnText>
           </CustomBtn>
 
           <CustomBtn onClick={previewPdf}>
             <CustomBtnText>View 2</CustomBtnText>
-          </CustomBtn>
+          </CustomBtn> */}
 
           <CustomBtn onClick={merge}>
             <CustomBtnText>Merge</CustomBtnText>
