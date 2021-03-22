@@ -70,6 +70,23 @@ const PageInput = styled.input`
   bottom: 54.23%;
 `;
 
+const PageInputPlaceholder = styled.div`
+  position: absolute;
+  left: 39.24%;
+  right: 54.65%;
+  top: 34.51%;
+  bottom: 42.96%;
+
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 20px;
+  line-height: 28px;
+  /* identical to box height */
+
+  color: rgba(0, 0, 0, 0.5);
+`;
+
 const wait = (timeout: number) => {
   return new Promise((resolve) => {
     setTimeout(resolve, timeout);
@@ -180,11 +197,11 @@ export function DeletePage() {
             <CustomBtnText>Delete</CustomBtnText>
           </CustomBtn>
 
-          <Spinner loading={loading} />
-
           <PageInput type="text" onChange={onChangePageno}></PageInput>
+          {!pageno && <PageInputPlaceholder>Page Number</PageInputPlaceholder>}
 
           {error && <div style={{ fontSize: 32, color: "#000", margin: 20 }}>{error.toString()}</div>}
+          <Spinner loading={loading} />
 
           {outputfile && <PdfView divId="adobe-dc-view-1" location={`${constants.backend}/api/v1/pdf/download?file=${outputfile}`} fileName={outputfile || ""} />}
         </Container>
