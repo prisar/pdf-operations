@@ -24,3 +24,4 @@ yarn-error.log*
 
 # because adode key present
 public/pdf.js
+.env

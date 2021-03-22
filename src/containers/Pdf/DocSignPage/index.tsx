@@ -2,6 +2,7 @@ import React from "react";
 import Dropzone from "react-dropzone";
 import styled from "styled-components";
 import { useHistory } from "react-router-dom";
+import axios from "axios";
 
 import "./index.css";
 import PdfView from "../../../components/PdfView";
@@ -68,6 +69,7 @@ export function DocSignPage() {
   const [apiAccessPoint, setApiAccessPoint] = React.useState(null);
   const [accessToken, setAccessToken] = React.useState(null);
   const [transientDocumentId, setTransientDocumentId] = React.useState(null);
+  const [agreementId, setAgreementId] = React.useState(null);
   const [signingStatus, setSigningStatus] = React.useState(null);
   const [error, setError] = React.useState("");
 
@@ -80,18 +82,15 @@ export function DocSignPage() {
       data.append("File", filedata);
 
       const url = `${apiAccessPoint}api/rest/v6/transientDocuments`;
-      const response = await fetch(url, {
-        method: "POST",
+      const response = await axios.post(url, data, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
           "Content-Type": "multipart/form-data",
         },
-        body: data,
       });
-      const jsonResponse = await response.json();
+      console.log(response.data);
 
-      console.log(jsonResponse);
-      setTransientDocumentId(jsonResponse.transientDocumentId);
+      setTransientDocumentId(response.data.transientDocumentId);
     } catch (err) {
       console.log(err);
     }
@@ -100,22 +99,37 @@ export function DocSignPage() {
   const sendAgreement = async () => {
     try {
       // create agreement
-      const data = new FormData();
-      data.append("File", filedata);
+      const data = {
+        fileInfos: [
+          {
+            transientDocumentId: transientDocumentId,
+          },
+        ],
+        name: "MyTestAgreement",
+        participantSetsInfo: [
+          {
+            memberInfos: [
+              {
+                email: "signer@somecompany.com",
+              },
+            ],
+            order: 1,
+            role: "SIGNER",
+          },
+        ],
+        signatureType: "ESIGN",
+        state: "IN_PROCESS",
+      };
 
-      const url = `${apiAccessPoint}/api/rest/v6/agreements`;
-      const response = await fetch(url, {
-        method: "POST",
+      const url = `${apiAccessPoint}api/rest/v6/agreements`;
+      const response = await axios.post(url, data, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
           "Content-Type": "multipart/form-data",
         },
-        body: data,
       });
-      const jsonResponse = await response.json();
-
-      console.log(jsonResponse);
-      setTransientDocumentId(jsonResponse.transientDocumentId);
+      console.log(response);
+      setAgreementId(response.data?.id);
     } catch (err) {
       console.log(err);
     }
@@ -140,6 +154,22 @@ export function DocSignPage() {
     }
   };
 
+  const getAgreements = async () => {
+    try {
+      if (!accessToken) {
+        alert("Signin with adobe first!");
+      }
+
+      if (!apiAccessPoint) {
+        alert("Api access point is set incorectly!");
+      }
+
+      // cursor
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   const checkStatus = async (agreementId: string) => {
     try {
       // call status api
@@ -159,7 +189,7 @@ export function DocSignPage() {
 
   const adobeSignin = () => {
     try {
-      const authUri = `${constants.esignauthshardendpoint}?redirect_uri=${constants.host}/docsign&response_type=code&client_id=${constants.esignauthclientid}&scope=user_login:self+agreement_send:account`;
+      const authUri = `${constants.esignauthshardendpoint}?redirect_uri=${constants.host}/docsign&response_type=code&client_id=${constants.esignauthclientid}&scope=user_login:self+agreement_send:account+agreement_read:account+agreement_write:account`;
       window.location.href = authUri;
     } catch (err) {
       console.log(err);
@@ -241,6 +271,7 @@ export function DocSignPage() {
               )}
             </Dropzone>
           </div>
+          {accessToken}
 
           <CustomBtn onClick={adobeSignin}>
             <CustomBtnText>Adobe Signin</CustomBtnText>
