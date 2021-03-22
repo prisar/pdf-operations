@@ -4,6 +4,7 @@ import styled from "styled-components";
 
 import "./index.css";
 import PdfView from "../../../components/PdfView";
+import Spinner from "../../../components/Loader/Spinner";
 import constants from "../../../config/constants";
 
 const ContainerBox = styled.div`
@@ -71,6 +72,7 @@ export function MergePage() {
   const [firstfiledata, setFirstfiledata] = React.useState(new Blob());
   const [secondfiledata, setSecondfiledata] = React.useState(new Blob());
   const [outputfile, setOutputfile] = React.useState(null);
+  const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
 
   const uploadPdf = async (filedata: any) => {
@@ -129,6 +131,7 @@ export function MergePage() {
   const merge = async () => {
     // upload and merge api call
     try {
+      setLoading(true);
       const uploads = [];
       uploads.push(uploadPdf(firstfiledata));
       uploads.push(uploadPdf(secondfiledata));
@@ -142,8 +145,9 @@ export function MergePage() {
       setFirstfiledata(new Blob());
       setSecondfiledata(new Blob());
 
-      await wait(60000);
+      await wait(30000);
       setPreview(true);
+      setLoading(false);
     } catch (err) {
       console.log(err);
     }
@@ -193,19 +197,13 @@ export function MergePage() {
           <CustomBtn onClick={uploadFiles}>
             <CustomBtnText>Upload</CustomBtnText>
           </CustomBtn>
-          {/* <CustomBtn onClick={previewPdf}>
-            <CustomBtnText>View 1</CustomBtnText>
-          </CustomBtn>
-
-          <CustomBtn onClick={previewPdf}>
-            <CustomBtnText>View 2</CustomBtnText>
-          </CustomBtn> */}
 
           <CustomBtn onClick={merge}>
             <CustomBtnText>Merge</CustomBtnText>
           </CustomBtn>
 
           {error && <div style={{ fontSize: 32, color: "#000", margin: 20 }}>{error.toString()}</div>}
+          <Spinner loading={loading} />
 
           {preview && <PdfView divId="adobe-dc-view-1" location={`${constants.backend}/api/v1/pdf/download?file=${outputfile}`} fileName={outputfile || ""} />}
         </Container>

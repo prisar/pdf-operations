@@ -48,11 +48,16 @@ Credentials and configurations are in .env
 REACT_APP_HOST=https://localhost:3000
 REACT_APP_BACKEND=https://pdf-operations-backend.herokuapp.com
 
-# Split Operation
+## Operations
+### Merge Operation
+
+Uploading two documents and poerforming merge action by clicking merge button will merge them both and show a preview.
+
+### Split Operation
 
 If the splitting page number is 2, the first part will have that page and rest of the pages will go to the next part.
 So, page number as input is taken after uploading the file.
 
-# Delete Operation
+### Delete Operation
 
 Takes page number and deletes that page. If successful, the pdf will be show as preview.
