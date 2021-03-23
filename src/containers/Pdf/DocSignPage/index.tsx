@@ -12,7 +12,6 @@ import Typography from "@material-ui/core/Typography";
 
 import "./index.css";
 import PdfView from "../../../components/PdfView";
-import HorizontalLinearStepper from "../../../components/Stepper/HorizontalLinearStepper";
 import constants from "../../../config/constants";
 
 const ContainerBox = styled.div`
@@ -79,6 +78,7 @@ const useStyles = makeStyles((theme) => ({
   instructions: {
     marginTop: theme.spacing(1),
     marginBottom: theme.spacing(1),
+    marginLeft: 620,
   },
 }));
 
