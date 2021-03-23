@@ -13,7 +13,7 @@ interface IProps {
 }
 
 export function PdfView({ divId, location, fileName }: IProps) {
-  const clientId = 'daceca64d23f45a492eaeec467562f06'; // localStorage.getItem('ADOBE_PDF_VIEW_CLIENT_ID');
+  const clientId = process.env.REACT_APP_PDF_TOOLS_CLIENT_ID;
   const jsocde = `document.addEventListener("adobe_dc_view_sdk.ready", function () {
         var adobeDCView = new AdobeDC.View({ clientId: "${clientId}", divId: "${divId}" });
         adobeDCView.previewFile({
