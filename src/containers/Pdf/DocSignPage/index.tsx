@@ -107,9 +107,11 @@ export function DocSignPage() {
   const [outputfile, setOutputfile] = React.useState(null);
   const [apiAccessPoint, setApiAccessPoint] = React.useState(null);
   const [accessToken, setAccessToken] = React.useState(null);
+  const [docName, setDocName] = React.useState('');
+  const [participant, setParticipant] = React.useState([]);
   const [transientDocumentId, setTransientDocumentId] = React.useState(null);
   const [agreementId, setAgreementId] = React.useState(null);
-  const [siginingUrl, setSigningUrl] = React.useState(null);
+  const [siginingUrls, setSigningUrls] = React.useState([]);
   const [signingStatus, setSigningStatus] = React.useState(null);
   const [error, setError] = React.useState("");
   const classes = useStyles();
@@ -174,9 +176,13 @@ export function DocSignPage() {
           "Content-Type": "multipart/form-data",
         },
       });
+      if (response.status >= 400) {
+        return;
+      }
       console.log(response.data);
 
       setTransientDocumentId(response.data.transientDocumentId);
+      handleNext();
     } catch (err) {
       console.log(err);
     }
@@ -191,12 +197,12 @@ export function DocSignPage() {
             transientDocumentId: transientDocumentId,
           },
         ],
-        name: "MyTestAgreement",
+        name: docName,
         participantSetsInfo: [
           {
             memberInfos: [
               {
-                email: "signer@somecompany.com",
+                email: participant,
               },
             ],
             order: 1,
@@ -214,7 +220,12 @@ export function DocSignPage() {
           "Content-Type": "application/json",
         },
       });
+      if (response.status >= 400) {
+        return;
+      }
+      console.log(response);
       setAgreementId(response.data?.id);
+      handleNext();
     } catch (err) {
       console.log(err);
     }
@@ -222,15 +233,23 @@ export function DocSignPage() {
 
   const getSigningUrl = async () => {
     try {
+      console.log(agreementId);
       const url = `${apiAccessPoint}api/rest/v6/agreements/${agreementId}/signingUrls`;
       const response = await axios.get(url, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-
+      if (response.status >= 400) {
+        setError(`error ${response.status}`);
+        return;
+      }
       console.log(response);
-      // setSigningUrl();
+      const urls = response.data?.signingUrlSetInfos?.map((info: any) => {
+        const [first] = info.signingUrls;
+        return first;
+      });
+      setSigningUrls(urls);
     } catch (err) {
       console.log(err);
     }
@@ -320,6 +339,9 @@ export function DocSignPage() {
           "Content-Type": "application/x-www-form-urlencoded",
         },
       });
+      if (response.status >= 400) {
+        return;
+      }
       const jsonResponse = await response.json();
       setAccessToken(jsonResponse.access_token);
       localStorage.setItem("access_token", jsonResponse.access_token as string);
@@ -428,6 +450,10 @@ export function DocSignPage() {
                   {activeStep === 2 && (
                     <div style={{ justifyContent: "center", alignItems: "center", margin: 20, minWidth: 500, minHeight: 300, alignSelf: "center", backgroundColor: "#fff" }}>
                       <div style={{ marginLeft: 500, paddingTop: 30 }}>
+                        <div style={{display: 'flex', flexDirection: 'column', height: 100, width: 200, marginLeft: 60}}>
+                        <input value={docName} onChange={(event: any) => setDocName(event.target.value)} placeholder="document name" style={{margin: 5, height: 50, borderRadius: 5, borderWidth: 0.5}}/>
+                        <input type="email" value={participant} onChange={(event: any) => setParticipant(event.target.value)} placeholder="signer email" style={{margin: 5, height: 50, borderRadius: 5, borderWidth: 0.5}} />
+                        </div>
                         <CustomBtn onClick={sendAgreement}>
                           <CustomBtnText>Send</CustomBtnText>
                         </CustomBtn>
@@ -439,9 +465,15 @@ export function DocSignPage() {
                     <div style={{ justifyContent: "center", alignItems: "center", margin: 20, minWidth: 500, minHeight: 300, alignSelf: "center", backgroundColor: "#fff" }}>
                       <div style={{ marginLeft: 500, paddingTop: 30 }}>
                         <CustomBtn onClick={getSigningUrl}>
-                          <CustomBtnText>Get eSign Url</CustomBtnText>
+                          <CustomBtnText>Get eSign Urls</CustomBtnText>
                         </CustomBtn>
-                        <div>{siginingUrl}</div>
+                        <div style={{ paddingTop: 20 }}>
+                          {siginingUrls?.map((e: any, index) => (
+                            <div>
+                              {index + 1}. {e?.email}, <a href={e?.esignUrl}>esign</a>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   )}
