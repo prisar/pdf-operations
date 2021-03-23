@@ -60,10 +60,19 @@ const CustomBtnText = styled.div`
   color: #ffffff;
 `;
 
+const Input = styled.input`
+  width: 100;
+  height: 70;
+`;
+
 export function ReorderPage() {
   const [preview, setPreview] = React.useState(false);
   const [filedata, setFiledata] = React.useState(new Blob());
   const [outputfile, setOutputfile] = React.useState(null);
+  const [pageIndexes, setPageIndexes] = React.useState([]);
+  const [index, setIndex] = React.useState('');
+  const [indexText, setIndexText] = React.useState("");
+  const [expression, setExpression] = React.useState("");
   const [error, setError] = React.useState("");
 
   const reorder = async () => {
@@ -71,23 +80,23 @@ export function ReorderPage() {
     try {
       const data = {
         pdfFile: (filedata as any).name,
-        pageIndexes: [
-          {
-            index: 0,
-            type: "page",
-            page: 1,
-          },
-          {
-            index: 1,
-            type: "range",
-            range: {
-              start: 3,
-              end: 4,
-            },
-          },
-        ],
+        // pageIndexes: [
+        //   {
+        //     index: 0,
+        //     type: "page",
+        //     page: 1,
+        //   },
+        //   {
+        //     index: 1,
+        //     type: "range",
+        //     range: {
+        //       start: 3,
+        //       end: 4,
+        //     },
+        //   },
+        // ],
+        pageIndexes: pageIndexes,
       };
-      console.log(data);
 
       const url = `${constants.backend}/api/v1/pdf/reorder`;
       const response = await fetch(url, {
@@ -128,7 +137,44 @@ export function ReorderPage() {
     }
   };
 
-  React.useEffect(() => {}, [outputfile]);
+  const addPageIndex = () => {
+    setExpression(`${expression}${!expression ? '' : ','} [${indexText}]`);
+    const indexType = indexText?.split(",").length === 2 ? "range" : "page";
+
+    if (indexType === "page") {
+      const pageIndex = {
+        index: 0,
+        type: "page",
+        page: parseInt(index || ''),
+      };
+      const indexes = [...pageIndexes, pageIndex];
+      setPageIndexes(indexes as any);
+    }
+    if (indexType === "range") {
+      const pageIndex = {
+        index: parseInt(index || ''),
+        type: "range",
+        range: {
+          start: parseInt(indexText?.split(",")[0]),
+          end: parseInt(indexText?.split(",")[1]),
+        },
+      };
+      const indexes = [...pageIndexes, pageIndex];
+      setPageIndexes(indexes as any);
+    }
+    setIndex('');
+    setIndexText('');
+  };
+
+  const onChangeIndex = (event: any) => {
+    setIndex(event.target.value);
+  };
+
+  const onChangeIndexText = (event: any) => {
+    setIndexText(event.target.value);
+  };
+
+  React.useEffect(() => {}, [outputfile, expression]);
 
   return (
     <div>
@@ -164,6 +210,25 @@ export function ReorderPage() {
           <CustomBtn onClick={reorder}>
             <CustomBtnText>Reorder</CustomBtnText>
           </CustomBtn>
+          {expression && <div style={{ fontSize: 32, color: "green", margin: 20 }}>{expression}</div>}
+          <div style={{ justifyContent: "center", alignItems: "center", margin: 20, minWidth: 500, minHeight: 200, alignSelf: "center", backgroundColor: "#fafafa" }}>
+            <div style={{ marginLeft: 500, paddingTop: 30, flexDirection: "row" }}>
+              <div>
+                <div>Index</div>
+                <Input value={index} onChange={onChangeIndex} />
+              </div>
+              <div>
+                <div>Page / Range</div>
+                <Input value={indexText} onChange={onChangeIndexText}/>
+              </div>
+            </div>
+            <div style={{ marginLeft: 450, paddingBottom: 10, paddingTop: 20, flexDirection: "row", width: 400 }}>
+            <CustomBtn onClick={addPageIndex}>
+              <CustomBtnText>Add</CustomBtnText>
+            </CustomBtn>
+            </div>
+          </div>
+
           {error && <div style={{ fontSize: 32, color: "#000", margin: 20 }}>{error.toString()}</div>}
 
           {preview && <PdfView divId="adobe-dc-view-1" location={`${constants.backend}/api/v1/pdf/download?file=${outputfile}`} fileName={outputfile || ""} />}
