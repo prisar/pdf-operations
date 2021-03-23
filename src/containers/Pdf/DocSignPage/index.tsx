@@ -109,6 +109,7 @@ export function DocSignPage() {
   const [accessToken, setAccessToken] = React.useState(null);
   const [transientDocumentId, setTransientDocumentId] = React.useState(null);
   const [agreementId, setAgreementId] = React.useState(null);
+  const [siginingUrl, setSigningUrl] = React.useState(null);
   const [signingStatus, setSigningStatus] = React.useState(null);
   const [error, setError] = React.useState("");
   const classes = useStyles();
@@ -229,6 +230,7 @@ export function DocSignPage() {
       });
 
       console.log(response);
+      // setSigningUrl();
     } catch (err) {
       console.log(err);
     }
@@ -439,6 +441,7 @@ export function DocSignPage() {
                         <CustomBtn onClick={getSigningUrl}>
                           <CustomBtnText>Get eSign Url</CustomBtnText>
                         </CustomBtn>
+                        <div>{siginingUrl}</div>
                       </div>
                     </div>
                   )}
