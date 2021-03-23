@@ -3,9 +3,16 @@ import Dropzone from "react-dropzone";
 import styled from "styled-components";
 import { useHistory } from "react-router-dom";
 import axios from "axios";
+import { makeStyles } from "@material-ui/core/styles";
+import Stepper from "@material-ui/core/Stepper";
+import Step from "@material-ui/core/Step";
+import StepLabel from "@material-ui/core/StepLabel";
+import Button from "@material-ui/core/Button";
+import Typography from "@material-ui/core/Typography";
 
 import "./index.css";
 import PdfView from "../../../components/PdfView";
+import HorizontalLinearStepper from "../../../components/Stepper/HorizontalLinearStepper";
 import constants from "../../../config/constants";
 
 const ContainerBox = styled.div`
@@ -62,6 +69,38 @@ const CustomBtnText = styled.div`
   color: #ffffff;
 `;
 
+const useStyles = makeStyles((theme) => ({
+  root: {
+    width: "100%",
+  },
+  button: {
+    marginRight: theme.spacing(1),
+  },
+  instructions: {
+    marginTop: theme.spacing(1),
+    marginBottom: theme.spacing(1),
+  },
+}));
+
+function getSteps() {
+  return ["Adobe Signin", "Agreement creation", "Sending the agreement", "Sign the document!"];
+}
+
+function getStepContent(step: any) {
+  switch (step) {
+    case 0:
+      return "Adobe Signin...";
+    case 1:
+      return "Create an agreement!";
+    case 2:
+      return "Send the agreement for signing!";
+    case 3:
+      return "Get signing url, and sign the document as a signer!";
+    default:
+      return "Unknown step";
+  }
+}
+
 export function DocSignPage() {
   const [preview, setPreview] = React.useState(false);
   const [filedata, setFiledata] = React.useState(new Blob());
@@ -72,6 +111,52 @@ export function DocSignPage() {
   const [agreementId, setAgreementId] = React.useState(null);
   const [signingStatus, setSigningStatus] = React.useState(null);
   const [error, setError] = React.useState("");
+  const classes = useStyles();
+  const [activeStep, setActiveStep] = React.useState(0);
+  const [skipped, setSkipped] = React.useState(new Set());
+  const steps = getSteps();
+
+  const isStepOptional = (step: any) => {
+    return step === 4;
+  };
+
+  const isStepSkipped = (step: any) => {
+    return skipped.has(step);
+  };
+
+  const handleNext = () => {
+    let newSkipped = skipped;
+    if (isStepSkipped(activeStep)) {
+      newSkipped = new Set(newSkipped.values());
+      newSkipped.delete(activeStep);
+    }
+
+    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    setSkipped(newSkipped);
+  };
+
+  const handleBack = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep - 1);
+  };
+
+  const handleSkip = () => {
+    if (!isStepOptional(activeStep)) {
+      // You probably want to guard against something like this,
+      // it should never occur unless someone's actively trying to break something.
+      throw new Error("You can't skip a step that isn't optional.");
+    }
+
+    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    setSkipped((prevSkipped) => {
+      const newSkipped = new Set(prevSkipped.values());
+      newSkipped.add(activeStep);
+      return newSkipped;
+    });
+  };
+
+  const handleReset = () => {
+    setActiveStep(0);
+  };
 
   const history = useHistory();
 
@@ -125,11 +210,25 @@ export function DocSignPage() {
       const response = await axios.post(url, data, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "multipart/form-data",
+          "Content-Type": "application/json",
         },
       });
-      console.log(response);
       setAgreementId(response.data?.id);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const getSigningUrl = async () => {
+    try {
+      const url = `${apiAccessPoint}api/rest/v6/agreements/${agreementId}/signingUrls`;
+      const response = await axios.get(url, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      console.log(response);
     } catch (err) {
       console.log(err);
     }
@@ -161,7 +260,7 @@ export function DocSignPage() {
       }
 
       if (!apiAccessPoint) {
-        alert("Api access point is set incorectly!");
+        alert("Api access point is set incorrectly!");
       }
 
       // cursor
@@ -209,6 +308,9 @@ export function DocSignPage() {
 
   const getAccessToken = async (apiaccesspoint: string, code: string) => {
     try {
+      if (!code) {
+        return;
+      }
       const url = `${apiaccesspoint}oauth/token?code=${code}&client_id=${constants.esignauthclientid}&client_secret=${constants.esignauthclientsecret}&redirect_uri=${constants.host}/docsign&grant_type=authorization_code`;
       const response = await fetch(url, {
         method: "POST",
@@ -218,7 +320,8 @@ export function DocSignPage() {
       });
       const jsonResponse = await response.json();
       setAccessToken(jsonResponse.access_token);
-      localStorage.setItem("access_token", JSON.stringify(jsonResponse.access_token));
+      localStorage.setItem("access_token", jsonResponse.access_token as string);
+      localStorage.setItem("refresh_token", jsonResponse.refresh_token as string);
     } catch (err) {
       console.log(err);
     }
@@ -228,62 +331,137 @@ export function DocSignPage() {
     const auth_code = new URLSearchParams(window.location.search).get("code");
     const apiaccesspoint = new URLSearchParams(window.location.search).get("api_access_point");
     const webaccesspoint = new URLSearchParams(window.location.search).get("web_access_point");
-    if (auth_code) {
-      getAccessToken(apiaccesspoint as string, auth_code);
-      setApiAccessPoint(apiaccesspoint as any);
-      localStorage.setItem("api_access_point", JSON.stringify(apiaccesspoint));
-    }
 
-    history.listen((location: any, action: any) => {
-      // console.log(action, location.pathname, location.state);
-      const esign_api_access_point = JSON.parse(localStorage.getItem("api_access_point") as string);
-      const esign_token = JSON.parse(localStorage.getItem("access_token") as string);
-      if (esign_api_access_point) {
-        setApiAccessPoint(esign_api_access_point as any);
+    if (!accessToken) {
+      const esign_token = localStorage.getItem("access_token") as string;
+      setAccessToken(esign_token as any);
+      const esign_api_access_point = localStorage.getItem("api_access_point") as string;
+      setApiAccessPoint(esign_api_access_point as any);
+      console.log(esign_api_access_point);
+      if (auth_code) {
+        getAccessToken(apiaccesspoint as string, auth_code as string);
+        setApiAccessPoint(apiaccesspoint as any);
+        localStorage.setItem("api_access_point", apiaccesspoint as string);
       }
-      if (esign_token) {
-        setAccessToken(esign_token as any);
-      }
-    });
-  }, []);
+    }
+  }, [accessToken, apiAccessPoint]);
 
   return (
     <div>
       <ContainerBox>
         <Container>
-          <div style={{ marginLeft: 40 }}>
-            <Dropzone
-              onDrop={(acceptedFiles) => {
-                processFiles(acceptedFiles);
-              }}
-            >
-              {({ getRootProps, getInputProps }) => (
-                <section>
-                  <div style={{ width: 1080, height: 120, backgroundColor: "red", margin: 20, borderRadius: 10, justifyContent: "center", alignItems: "center" }} {...getRootProps()}>
-                    <input {...getInputProps()} />
-                    <div style={{ margin: 10, height: 30, color: "#fff" }}>
-                      <p>Drag 'n' drop some file here, or click to select file</p>
+          <br />
+          <div className={classes.root}>
+            <Stepper activeStep={activeStep}>
+              {steps.map((label, index) => {
+                const stepProps = { completed: false };
+                const labelProps = { optional: <></> };
+                if (isStepOptional(index)) {
+                  labelProps.optional = <Typography variant="caption">Optional</Typography>;
+                }
+                if (isStepSkipped(index)) {
+                  stepProps.completed = false;
+                }
+                return (
+                  <Step key={label} {...stepProps}>
+                    <StepLabel {...labelProps}>{label}</StepLabel>
+                  </Step>
+                );
+              })}
+            </Stepper>
+            <div>
+              {activeStep === steps.length ? (
+                <div>
+                  <Typography className={classes.instructions}>All steps completed - you&apos;re finished</Typography>
+                  <Button onClick={handleReset} className={classes.button}>
+                    Reset
+                  </Button>
+                </div>
+              ) : (
+                <div>
+                  {activeStep === 0 && (
+                    <div style={{ justifyContent: "center", alignItems: "center", margin: 20, minWidth: 500, minHeight: 300, alignSelf: "center", backgroundColor: "#fff" }}>
+                      {!accessToken ? (
+                        <div style={{ marginLeft: 500, paddingTop: 100 }}>
+                          <CustomBtn onClick={adobeSignin}>
+                            <CustomBtnText>Adobe Signin</CustomBtnText>
+                          </CustomBtn>
+                        </div>
+                      ) : (
+                        <div style={{ fontFamily: "Roboto", fontWeight: "bold", fontSize: 32, textAlign: "center", paddingTop: 100 }}>Already sigined in, proceed to next step</div>
+                      )}
                     </div>
+                  )}
 
-                    <div style={{ margin: 10, height: 30, color: "#fff" }}>{(filedata as any).name}</div>
+                  {activeStep === 1 && (
+                    <div style={{ justifyContent: "center", alignItems: "center", margin: 20, minWidth: 500, minHeight: 300, alignSelf: "center", backgroundColor: "#fff" }}>
+                      <div style={{ marginLeft: 100, paddingTop: 20 }}>
+                        <Dropzone
+                          onDrop={(acceptedFiles) => {
+                            processFiles(acceptedFiles);
+                          }}
+                        >
+                          {({ getRootProps, getInputProps }) => (
+                            <section>
+                              <div style={{ width: 1080, height: 120, backgroundColor: "red", margin: 20, borderRadius: 10, justifyContent: "center", alignItems: "center" }} {...getRootProps()}>
+                                <input {...getInputProps()} />
+                                <div style={{ margin: 10, height: 30, color: "#fff" }}>
+                                  <p>Drag 'n' drop some file here, or click to select file</p>
+                                </div>
+
+                                <div style={{ margin: 10, height: 30, color: "#fff" }}>{(filedata as any).name}</div>
+                              </div>
+                            </section>
+                          )}
+                        </Dropzone>
+                      </div>
+                      <div style={{ marginLeft: 500, paddingTop: 30 }}>
+                        <CustomBtn onClick={createAgreement}>
+                          <CustomBtnText>Agreement</CustomBtnText>
+                        </CustomBtn>
+                      </div>
+                    </div>
+                  )}
+
+                  {activeStep === 2 && (
+                    <div style={{ justifyContent: "center", alignItems: "center", margin: 20, minWidth: 500, minHeight: 300, alignSelf: "center", backgroundColor: "#fff" }}>
+                      <div style={{ marginLeft: 500, paddingTop: 30 }}>
+                        <CustomBtn onClick={sendAgreement}>
+                          <CustomBtnText>Send</CustomBtnText>
+                        </CustomBtn>
+                      </div>
+                    </div>
+                  )}
+
+                  {activeStep === 3 && (
+                    <div style={{ justifyContent: "center", alignItems: "center", margin: 20, minWidth: 500, minHeight: 300, alignSelf: "center", backgroundColor: "#fff" }}>
+                      <div style={{ marginLeft: 500, paddingTop: 30 }}>
+                        <CustomBtn onClick={getSigningUrl}>
+                          <CustomBtnText>Get eSign Url</CustomBtnText>
+                        </CustomBtn>
+                      </div>
+                    </div>
+                  )}
+
+                  <Typography className={classes.instructions}>{getStepContent(activeStep)}</Typography>
+                  <div>
+                    <Button disabled={activeStep === 0} onClick={handleBack} className={classes.button}>
+                      Back
+                    </Button>
+                    {isStepOptional(activeStep) && (
+                      <Button variant="contained" color="primary" onClick={handleSkip} className={classes.button}>
+                        Skip
+                      </Button>
+                    )}
+
+                    <Button variant="contained" color="primary" onClick={handleNext} className={classes.button}>
+                      {activeStep === steps.length - 1 ? "Finish" : "Next"}
+                    </Button>
                   </div>
-                </section>
+                </div>
               )}
-            </Dropzone>
+            </div>
           </div>
-          {accessToken}
-
-          <CustomBtn onClick={adobeSignin}>
-            <CustomBtnText>Adobe Signin</CustomBtnText>
-          </CustomBtn>
-
-          <CustomBtn onClick={esign}>
-            <CustomBtnText>eSign</CustomBtnText>
-          </CustomBtn>
-
-          <CustomBtn onClick={checkStatus}>
-            <CustomBtnText>Status</CustomBtnText>
-          </CustomBtn>
 
           {error && <div style={{ fontSize: 32, color: "#000", margin: 20 }}>{error.toString()}</div>}
         </Container>
