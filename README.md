@@ -61,3 +61,17 @@ So, page number as input is taken after uploading the file.
 ### Delete Operation
 
 Takes page number and deletes that page. If successful, the pdf will be show as preview.
+
+### Reorder
+
+It takes parameters as index and pages. Then it rearranges based on the order of indexes. For example, 
+index: 0, page range: [3,4]
+index: 1, page range: [1]
+
+In this case the 3rd and 4th page will come first and 1st page will go last.
+
+All input files are in files folder
+
+## ESign
+
+It is and work flow. First th user perform adobe signin. Then uploads the document which creates a transient document id. With this a new agreemnet is created in next step. After that, with the help of siging url, the signer can sign the document.
