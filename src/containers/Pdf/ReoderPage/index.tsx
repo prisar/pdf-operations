@@ -65,8 +65,13 @@ const Input = styled.input`
   height: 70;
 `;
 
+const wait = (timeout: number) => {
+  return new Promise((resolve) => {
+    setTimeout(resolve, timeout);
+  });
+};
+
 export function ReorderPage() {
-  const [preview, setPreview] = React.useState(false);
   const [filedata, setFiledata] = React.useState(new Blob());
   const [outputfile, setOutputfile] = React.useState(null);
   const [pageIndexes, setPageIndexes] = React.useState([]);
@@ -78,6 +83,9 @@ export function ReorderPage() {
   const reorder = async () => {
     // reorder api call
     try {
+      if (!filedata) {
+        setError('Add file');
+      }
       const data = {
         pdfFile: (filedata as any).name,
         // pageIndexes: [
@@ -107,6 +115,8 @@ export function ReorderPage() {
         body: JSON.stringify(data),
       });
       const json = await response.json();
+      await wait(15000);
+
       setOutputfile(json?.file);
       return response;
     } catch (err) {
@@ -231,7 +241,7 @@ export function ReorderPage() {
 
           {error && <div style={{ fontSize: 32, color: "#000", margin: 20 }}>{error.toString()}</div>}
 
-          {preview && <PdfView divId="adobe-dc-view-1" location={`${constants.backend}/api/v1/pdf/download?file=${outputfile}`} fileName={outputfile || ""} />}
+          {outputfile && <PdfView divId="adobe-dc-view-1" location={`${constants.backend}/api/v1/pdf/download?file=${outputfile}`} fileName={outputfile || ""} />}
         </Container>
       </ContainerBox>
     </div>
