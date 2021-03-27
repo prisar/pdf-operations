@@ -1,7 +1,6 @@
 import React from "react";
 import Dropzone from "react-dropzone";
 import styled from "styled-components";
-import { useHistory } from "react-router-dom";
 import axios from "axios";
 import { makeStyles } from "@material-ui/core/styles";
 import Stepper from "@material-ui/core/Stepper";
@@ -11,7 +10,6 @@ import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 
 import "./index.css";
-import PdfView from "../../../components/PdfView";
 import constants from "../../../config/constants";
 
 const ContainerBox = styled.div`
@@ -102,9 +100,7 @@ function getStepContent(step: any) {
 }
 
 export function DocSignPage() {
-  const [preview, setPreview] = React.useState(false);
   const [filedata, setFiledata] = React.useState(new Blob());
-  const [outputfile, setOutputfile] = React.useState(null);
   const [apiAccessPoint, setApiAccessPoint] = React.useState(null);
   const [accessToken, setAccessToken] = React.useState(null);
   const [docName, setDocName] = React.useState('');
@@ -112,7 +108,6 @@ export function DocSignPage() {
   const [transientDocumentId, setTransientDocumentId] = React.useState(null);
   const [agreementId, setAgreementId] = React.useState(null);
   const [siginingUrls, setSigningUrls] = React.useState([]);
-  const [signingStatus, setSigningStatus] = React.useState(null);
   const [error, setError] = React.useState("");
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
@@ -160,8 +155,6 @@ export function DocSignPage() {
   const handleReset = () => {
     setActiveStep(0);
   };
-
-  const history = useHistory();
 
   const createAgreement = async () => {
     try {
@@ -255,57 +248,23 @@ export function DocSignPage() {
     }
   };
 
-  const esign = async () => {
-    try {
-      if (!accessToken) {
-        alert("Signin with adobe first!");
-      }
 
-      if (!apiAccessPoint) {
-        alert("Api access point is set incorectly!");
-      }
-
-      await createAgreement();
-
-      // send the document for sigining
-      await sendAgreement();
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const getAgreements = async () => {
-    try {
-      if (!accessToken) {
-        alert("Signin with adobe first!");
-      }
-
-      if (!apiAccessPoint) {
-        alert("Api access point is set incorrectly!");
-      }
-
-      // cursor
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const checkStatus = async (agreementId: string) => {
-    try {
-      // call status api
-      const url = `${apiAccessPoint}api/rest/v6/agreements/${agreementId}`;
-      const response = await fetch(url, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-      const jsonResponse = await response.json();
-      setSigningStatus(jsonResponse.status);
-    } catch (err) {
-      console.log(err);
-    }
-  };
+  // const checkStatus = async (agreementId: string) => {
+  //   try {
+  //     // call status api
+  //     const url = `${apiAccessPoint}api/rest/v6/agreements/${agreementId}`;
+  //     const response = await fetch(url, {
+  //       method: "GET",
+  //       headers: {
+  //         Authorization: `Bearer ${accessToken}`,
+  //       },
+  //     });
+  //     const jsonResponse = await response.json();
+  //     // setSigningStatus(jsonResponse.status);
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // };
 
   const adobeSignin = () => {
     try {
@@ -354,7 +313,6 @@ export function DocSignPage() {
   React.useEffect(() => {
     const auth_code = new URLSearchParams(window.location.search).get("code");
     const apiaccesspoint = new URLSearchParams(window.location.search).get("api_access_point");
-    const webaccesspoint = new URLSearchParams(window.location.search).get("web_access_point");
 
     if (!accessToken) {
       const esign_token = localStorage.getItem("access_token") as string;

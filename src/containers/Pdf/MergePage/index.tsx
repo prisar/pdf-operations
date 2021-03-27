@@ -81,7 +81,7 @@ export function MergePage() {
       data.append("pdfFile", filedata);
 
       const url = `${constants.backend}/api/v1/pdf/upload`;
-      const response = await fetch(url, {
+      await fetch(url, {
         method: "POST",
         body: data,
       });
@@ -140,7 +140,7 @@ export function MergePage() {
       await wait(5000);
 
       // merge
-      const response = await callMergeApi(firstfiledata, secondfiledata);
+      await callMergeApi(firstfiledata, secondfiledata);
 
       setFirstfiledata(new Blob());
       setSecondfiledata(new Blob());
@@ -160,10 +160,6 @@ export function MergePage() {
     } else {
       setError("Check the no of files");
     }
-  };
-
-  const previewPdf = () => {
-    setPreview(!preview);
   };
 
   React.useEffect(() => {}, [outputfile]);

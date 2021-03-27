@@ -138,7 +138,7 @@ export function ReorderPage() {
       data.append("pdfFile", filedata);
 
       const url = `${constants.backend}/api/v1/pdf/upload`;
-      const response = await fetch(url, {
+      await fetch(url, {
         method: "POST",
         body: data,
       });
