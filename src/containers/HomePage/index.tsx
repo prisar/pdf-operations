@@ -1,7 +1,6 @@
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 
-import useScript from "../../hooks/useScript";
 import "./index.css";
 
 const ContainerBox = styled.div`

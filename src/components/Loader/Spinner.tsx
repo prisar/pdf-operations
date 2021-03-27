@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { css } from "@emotion/core";
 import ClipLoader from "react-spinners/ClipLoader";
 
@@ -14,11 +13,11 @@ interface IProps {
 }
 
 function Spinner({loading}: IProps) {
-  let [color, setColor] = useState("#ffffff");
+  // let [color, setColor] = useState("#ffffff");
 
   return (
     <div className="sweet-loading">
-      <ClipLoader color={color} loading={loading} css={override} size={150} />
+      <ClipLoader color={'#ffffff'} loading={loading} css={override} size={150} />
     </div>
   );
 }

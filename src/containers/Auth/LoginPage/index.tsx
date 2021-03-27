@@ -1,5 +1,4 @@
 import React from "react";
-import Dropzone from "react-dropzone";
 import styled from "styled-components";
 import { useHistory } from "react-router-dom";
 
@@ -51,26 +50,6 @@ const CustomBtnText = styled.div`
   text-align: center;
 
   color: #ffffff;
-`;
-
-const Title = styled.div`
-  position: absolute;
-  left: 35.35%;
-  right: 35.35%;
-  top: 21.13%;
-  bottom: 73.77%;
-
-  font-family: Roboto;
-  font-style: normal;
-  font-weight: 500;
-  font-size: 64px;
-  line-height: 52px;
-  /* identical to box height */
-  display: flex;
-  align-items: center;
-  text-align: center;
-
-  color: #000000;
 `;
 
 const EmailInput = styled.input`
