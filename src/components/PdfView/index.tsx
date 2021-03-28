@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { ReactNode } from 'react';
+// import { ReactNode } from 'react';
 
 import usePdfScript from "../../hooks/usePdfScript";
 import "./index.css";
